@@ -8,13 +8,13 @@ const transporter=nodemailer.createTransport({
     }
 });
 
-// const sendEmail=async()=>{
-//     const mailOptions={
-//         from:'aissaes0203@gmail.com',
-//         to:'nihalreddy.vanga@gmail.com',
-//         subject:'Hello',
-//         text:'hELLO THIS IN NIHAK'
-//     }
-//     await transporter.sendMail(mailOptions);
-// }
-export default transporter;
+const sendEmail=async(to,subject,text)=>{
+    const mailOptions={
+        from:'aissaes0203@gmail.com',
+        to:to,
+        subject:subject,
+        text:text
+    }
+    await transporter.sendMail(mailOptions);
+}
+export default sendEmail;

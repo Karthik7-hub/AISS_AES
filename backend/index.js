@@ -11,11 +11,14 @@ dotenv.config();
 import connectDB from "./configurations/database.js";
 import sendEmail from "./configurations/nodemailer.js";
 
+// Routes imports
+import facultyAuthRouter from "./routes/facultyAuth.js";
+import facultyRouter from "./routes/facultyRoutes.js";
 
 const PORT = 5000;
 connectDB();
 
-sendEmail();
+// sendEmail();
 
 const app = express();
 
@@ -24,6 +27,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use("/faculty/auth", facultyAuthRouter);
+app.use("/faculty", facultyRouter);
 
 
 
