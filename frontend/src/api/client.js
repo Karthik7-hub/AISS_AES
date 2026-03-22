@@ -14,6 +14,47 @@ const client = axios.create({
 client.interceptors.response.use(
   (res) => res,
   (error) => {
+    let errorMessage = 'An unexpected error occurred.';
+
+    if (error.response) {
+      // Server responded with a status other than 2xx
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 400) {
+        errorMessage = data?.message || 'Invalid request. Please check your input.';
+      } else if (status === 401) {
+        errorMessage = data?.message || 'Invalid credentials. Please log in again.';
+      } else if (status === 403) {
+        errorMessage = data?.message || 'You do not have permission to perform this action.';
+      } else if (status === 404) {
+        errorMessage = data?.message || 'Requested resource not found.';
+      } else if (status >= 500) {
+        errorMessage = data?.message || 'Internal server error. Please try again later.';
+      } else {
+        errorMessage = data?.message || `Error: ${status}`;
+      }
+    } else if (error.request) {
+      // Request was made but no response received (e.g., network error or server offline)
+      errorMessage = 'Server is not responding. Please check your internet connection or try again later.';
+    } else {
+      // Something happened while setting up the request
+      errorMessage = error.message || 'Failed to make the request.';
+    }
+
+    // Attach the clean message directly to the error object
+    error.message = errorMessage;
+    
+    // Ensure components relying on `err.response?.data?.message` still work flawlessly
+    // particularly for network errors where error.response is undefined
+    if (!error.response) {
+      error.response = { data: { message: errorMessage } };
+    } else if (!error.response.data) {
+      error.response.data = { message: errorMessage };
+    } else if (typeof error.response.data === 'object' && !error.response.data.message) {
+      error.response.data.message = errorMessage;
+    }
+
     return Promise.reject(error);
   }
 );
