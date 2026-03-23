@@ -1,56 +1,44 @@
-//libraries imports
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import 'dotenv/config.js';
+import "dotenv/config.js";
 import cookieParser from "cookie-parser";
-dotenv.config();
 
-
-
-// File imports
 import connectDB from "./configurations/database.js";
-import sendEmail from "./configurations/nodemailer.js";
 
-// Routes imports
+// Routes
 import facultyAuthRouter from "./routes/facultyAuth.js";
 import facultyRouter from "./routes/facultyRoutes.js";
 import hodRouter from "./routes/hodRoutes.js";
 import superAdminRouter from "./routes/superAdminRoutes.js";
 
-// import timetableRoutes from "./routes/timeTableRoutes.js";
-// import questionPaperRoutes from "./routes/questionPaperRoutes.js";
-
-const PORT = 5000;
-connectDB();
-
-// sendEmail();
+dotenv.config();
 
 const app = express();
 
-
 const allowedOrigins = [
-    'http://localhost:5173', 
-    'https://aiss-aes-8ju1.vercel.app'
-    // local React dev
+  "http://localhost:5173",
+  "https://aiss-aes-8ju1.vercel.app"
 ];
+
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true 
+  origin: allowedOrigins,
+  credentials: true
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
+// 🔥 connect DB inside request lifecycle
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
+// routes
 app.use("/faculty/auth", facultyAuthRouter);
 app.use("/faculty", facultyRouter);
-app.use("/faculty/hod",hodRouter);
-app.use("/faculty/superadmin",superAdminRouter);
+app.use("/faculty/hod", hodRouter);
+app.use("/faculty/superadmin", superAdminRouter);
 
-// app.use("/faculty/timetable", timetableRoutes);
-// app.use("/faculty/question-paper", questionPaperRoutes);
-
-
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+export default app;
